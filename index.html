@@ -258,6 +258,7 @@ if(t.dataset.f){const f=t.files[0];if(!f)return;const r=new FileReader();r.onloa
 const SU='https://txrxreixyqdjmujfaxxv.supabase.co',SK='sb_publishable_rOD3loBsNgyMrLX5TsLE2A_qkT86nQl',WA='201012702258';
 let SB=null,ST=null,NT=[],U=null,pg='land',am={m:'up'},AD={q:'',st:'',o:'created',stats:null,reqs:[],users:[],det:null,err:''};
 try{SB=JSON.parse(localStorage.getItem('werd_sb'))}catch(e){}
+const HOME=()=>location.origin+location.pathname;
 const M=new Set(['st','marksel','fin','ans','sess','setstart','applystart','reset','imp','rv']);
 const ER={SUBSCRIPTION_REQUIRED:'انتهى اشتراكك. فعّل الاشتراك لمتابعة الحفظ.',FORBIDDEN:'غير مصرّح لك بهذا الإجراء.',ALREADY_PROCESSED:'تمت معالجة هذا الطلب سابقًا.',REQUEST_ALREADY_PENDING:'لديك طلب قيد المراجعة بالفعل.',ACCOUNT_SUSPENDED:'الحساب موقوف إداريًا.','Invalid login credentials':'البريد أو كلمة المرور غير صحيحة.','User already registered':'هذا البريد مسجّل بالفعل، سجّل الدخول.','Email not confirmed':'أكّد بريدك الإلكتروني أولًا من الرسالة التي وصلتك.'};
 const msg=e=>{const m=(e&&e.message)||'';for(const k in ER)if(m.includes(k))return ER[k];return 'حدث خطأ: '+m.slice(0,120)};
@@ -295,7 +296,7 @@ function showNewPw(){$('#who').innerHTML='';$('#nav').style.display='none';$('#a
 async function go(){const R=$('#ar'),say=t=>{R.textContent=t},m=am.m,e=$('#ae').value.trim().toLowerCase(),p=$('#ap').value;
 if(!/^\S+@\S+\.\S+$/.test(e))return say('أدخل بريدًا إلكترونيًا صحيحًا');if(p.length<6)return say('كلمة المرور ٦ أحرف على الأقل');
 try{say('جارٍ المعالجة…');let j;
-if(m==='up'){const nm=$('#an').value.trim();if(!nm)return say('أدخل الاسم');j=await raw('/auth/v1/signup',{method:'POST',headers:H(),body:JSON.stringify({email:e,password:p,data:{full_name:nm,phone:$('#ah').value.trim()}})});
+if(m==='up'){const nm=$('#an').value.trim();if(!nm)return say('أدخل الاسم');j=await raw('/auth/v1/signup?redirect_to='+encodeURIComponent(HOME()),{method:'POST',headers:H(),body:JSON.stringify({email:e,password:p,data:{full_name:nm,phone:$('#ah').value.trim()}})});
 if(!j.access_token)return say('تم إنشاء الحساب. أرسلنا رسالة تأكيد إلى بريدك، اضغط الرابط فيها ثم سجّل الدخول.')}
 else j=await raw('/auth/v1/token?grant_type=password',{method:'POST',headers:H(),body:JSON.stringify({email:e,password:p})});
 setSB(j);await enter()}catch(x){say(msg(x))}}
@@ -353,7 +354,7 @@ const adm=(f,ok)=>async()=>{try{await f();toast(ok);reload()}catch(x){toast(msg(
 Object.assign(A,{
 nread:async()=>{NT=NT.map(z=>({...z,read:true}));render();try{await rpc('mark_notifications_read')}catch(x){}},
 subnow:async()=>{try{await rpc('request_subscription')}catch(x){if(!/REQUEST_ALREADY_PENDING/.test(x.message))return toast(msg(x))}try{await refSt()}catch(x){}render();toast('تم إنشاء طلبك. أكمل التواصل عبر واتساب.');window.open(wa(),'_blank')},
-forgot:async()=>{const e=$('#ae').value.trim();if(!e)return toast('اكتب بريدك أولًا');try{await raw('/auth/v1/recover',{method:'POST',headers:H(),body:JSON.stringify({email:e})});toast('أرسلنا رابط إعادة التعيين إلى بريدك')}catch(x){toast(msg(x))}},
+forgot:async()=>{const e=$('#ae').value.trim();if(!e)return toast('اكتب بريدك أولًا');try{await raw('/auth/v1/recover?redirect_to='+encodeURIComponent(HOME()),{method:'POST',headers:H(),body:JSON.stringify({email:e})});toast('أرسلنا رابط إعادة التعيين إلى بريدك')}catch(x){toast(msg(x))}},
 newpw:async()=>{const p=$('#ap').value;if(p.length<6)return $('#ar').textContent='٦ أحرف على الأقل';try{await raw('/auth/v1/user',{method:'PUT',headers:H(SB.access_token),body:JSON.stringify({password:p})});await enter()}catch(x){$('#ar').textContent=msg(x)}},
 aload:()=>{AD.q=$('#aq').value;AD.st=$('#as').value;AD.o=$('#ao').value;loadAdm()},
 apr:t=>ask('تأكيد اعتماد الاشتراك لمدة شهر؟ تأكد أولًا من استلام المبلغ.',adm(()=>rpc('admin_approve_request',{rid:+t.dataset.id,note:null}),'تم تفعيل الاشتراك')),
