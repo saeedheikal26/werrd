@@ -211,7 +211,7 @@ return `<h2>إعدادات الخطة</h2><div class="card"><label class="f">ع�
 /* router */
 const R={'':home,hifz,rev:revp,quran,stats,set:setp};
 const NV=[['','🏠','الرئيسية'],['hifz','📖','الحفظ'],['rev','🔁','المراجعة'],['quran','📚','السور'],['stats','📊','إنجازاتي'],['set','⚙️','الإعدادات']];
-function render(){if(!U)return;const y=scrollY,h=location.hash.replace('#/','').split('/');$('#app').innerHTML=banner()+((!ent()&&(h[0]==='hifz'||h[0]==='rev'))?subp():(R[h[0]]||home)(h[1]));const nv=[...NV,['sub','💳','اشتراكي'],...(ST&&ST.is_admin?[['admin','🛡️','الإدارة']]:[])];$('#nav').innerHTML=nv.map(([k,i,l])=>`<a href="#/${k}" class="${(h[0]||'')===k?'on':''}"><span>${i}</span>${l}</a>`).join('');scrollTo(0,y);mark();hook(h)}
+function render(){if(!U)return;const y=scrollY,h=location.hash.replace('#/','').split('/');$('#app').innerHTML=banner()+((!ent()&&(h[0]==='hifz'||h[0]==='rev'))?suspp():(R[h[0]]||home)(h[1]));const nv=[...NV,...(ST&&ST.is_admin?[['admin','🛡️','الإدارة']]:[])];$('#nav').innerHTML=nv.map(([k,i,l])=>`<a href="#/${k}" class="${(h[0]||'')===k?'on':''}"><span>${i}</span>${l}</a>`).join('');scrollTo(0,y);mark();hook(h)}
 function route(){stop();stopSR();fin=fin&&location.hash.includes('hifz')?fin:null;scrollTo(0,0);render()}
 addEventListener('hashchange',route);
 function setSt(a,v){const k=portion().s+':'+a,o=S.st[k];S.st[k]=v;const L=LG();if(o!=='m'&&v==='m')L.mem++;if(o==='m'&&v!=='m')L.mem=Math.max(0,L.mem-1);save()}
@@ -219,7 +219,7 @@ function enq(s,f,t){let c=0,st=null;const flush=e=>{if(st!==null){S.rev.push({id
 for(let a=f;a<=t;a++){const k=s+':'+a;if(S.st[k]==='m'&&!S.rv[k]){S.rv[k]=1;if(st===null)st=a;}else{flush(a-1)}}flush(t);return c}
 function advance(p){S.pos=p.to<C[p.s-1]?{s:p.s,a:p.to+1}:{s:p.s%114+1,a:1}}
 const vlist=()=>{const p=portion();return[...sel].sort((a,b)=>a-b).map(a=>[p.s,a])};
-const A={am:t=>{am.m=t.dataset.v;pg='auth';showAuth()},land:()=>{pg='land';showAuth()},go:()=>go(),logout:()=>doLogout(),close:()=>$('#dlg').close(),done:()=>{fin=null},back:()=>{cur=null;rs=null;stopSR()},
+const A={am:t=>{am.m=t.dataset.v;am.adm=false;pg='auth';showAuth()},adm:()=>{am.adm=!am.adm;showAuth()},land:()=>{pg='land';showAuth()},go:()=>go(),logout:()=>doLogout(),close:()=>$('#dlg').close(),done:()=>{fin=null},back:()=>{cur=null;rs=null;stopSR()},
 sel:t=>{const a=+t.dataset.n;t.checked?sel.add(a):sel.delete(a)},
 peek:t=>t.classList.toggle('peek'),
 hide:()=>{hide=!hide;render()},stop:()=>stop(),
@@ -260,14 +260,14 @@ let SB=null,ST=null,NT=[],U=null,pg='land',am={m:'up'},AD={q:'',st:'',o:'created
 try{SB=JSON.parse(localStorage.getItem('werd_sb'))}catch(e){}
 const HOME=()=>location.origin+location.pathname;
 const M=new Set(['st','marksel','fin','ans','sess','setstart','applystart','reset','imp','rv']);
-const ER={SUBSCRIPTION_REQUIRED:'انتهى اشتراكك. فعّل الاشتراك لمتابعة الحفظ.',FORBIDDEN:'غير مصرّح لك بهذا الإجراء.',ALREADY_PROCESSED:'تمت معالجة هذا الطلب سابقًا.',REQUEST_ALREADY_PENDING:'لديك طلب قيد المراجعة بالفعل.',ACCOUNT_SUSPENDED:'الحساب موقوف إداريًا.','Invalid login credentials':'البريد أو كلمة المرور غير صحيحة.','User already registered':'هذا البريد مسجّل بالفعل، سجّل الدخول.','Email not confirmed':'أكّد بريدك الإلكتروني أولًا من الرسالة التي وصلتك.'};
+const ER={SUBSCRIPTION_REQUIRED:'انتهى اشتراكك. فعّل الاشتراك لمتابعة الحفظ.',FORBIDDEN:'غير مصرّح لك بهذا الإجراء.',ALREADY_PROCESSED:'تمت معالجة هذا الطلب سابقًا.',REQUEST_ALREADY_PENDING:'لديك طلب قيد المراجعة بالفعل.',ACCOUNT_SUSPENDED:'الحساب موقوف إداريًا.','Invalid login credentials':'البريد أو رقم الموبايل غير صحيح (للإدارة: البريد أو كلمة المرور).','User already registered':'هذا البريد مسجّل بالفعل، سجّل الدخول.','Email not confirmed':'أكّد بريدك الإلكتروني أولًا من الرسالة التي وصلتك.'};
 const msg=e=>{const m=(e&&e.message)||'';for(const k in ER)if(m.includes(k))return ER[k];return 'حدث خطأ: '+m.slice(0,120)};
 const H=t=>({apikey:SK,'Content-Type':'application/json',...(t?{Authorization:'Bearer '+t}:{})});
 async function raw(path,o){const r=await fetch(SU+path,o);let j=null;try{j=await r.json()}catch(e){}if(!r.ok)throw new Error((j&&(j.message||j.msg||j.error_description||j.error))||('HTTP '+r.status));return j}
 const setSB=j=>{SB={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),user:j.user||(SB&&SB.user)};localStorage.setItem('werd_sb',JSON.stringify(SB))};
 async function fresh(f){if(SB&&(f||SB.expires_at*1000-Date.now()<60000)){setSB(await raw('/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:H(),body:JSON.stringify({refresh_token:SB.refresh_token})}))}}
 async function rpc(fn,args){await fresh();return raw('/rest/v1/rpc/'+fn,{method:'POST',headers:H(SB.access_token),body:JSON.stringify(args||{})})}
-const ent=()=>!!ST&&(ST.status==='trial'||ST.status==='active');
+const ent=()=>!!ST&&ST.status!=='suspended';
 const refSt=async()=>{ST=await rpc('my_status')};
 let sT;function srvSave(){if(!U||!ent())return;clearTimeout(sT);sT=setTimeout(async()=>{try{await rpc('save_progress',{d:S})}catch(e){if(/SUBSCRIPTION_REQUIRED/.test(e.message)){try{await refSt()}catch(x){}render()}else toast('تعذّرت المزامنة الآن، سنعيد المحاولة عند الحفظ التالي')}},800)}
 /* ===== auth screens ===== */
@@ -280,23 +280,28 @@ const landHtml=()=>`<div class="lh"><h1>احفظ القرآن بخطة تناس�
 <div class="card"><div class="e">🎤</div><h3>تسميع بصوتك</h3>تظهر الكلمات وأنت تقرأ، وتُلوَّن مواضع الخطأ بالأحمر. (يعمل في المتصفحات الداعمة للتعرف على الصوت، وهو تقريبي.)</div>
 <div class="card"><div class="e">🔁</div><h3>مراجعة ذكية</h3>كل ما تحفظه يدخل جدول مراجعة، ويتباعد موعد المراجعة كلما كان حفظك أقوى.</div>
 <div class="card"><div class="e">🌱</div><h3>تقدّم بلا ضغط</h3>إنجازاتك وأيامك المتتالية أمامك، وتفويت يوم ليس فشلًا.</div></div>
-<h2>كيف تبدأ؟</h2><div class="card"><div class="stp"><i>١</i><span>أنشئ حسابك مجانًا وابدأ تجربة 30 يومًا.</span></div><div class="stp"><i>٢</i><span>احفظ وردك اليوم، واستمع وكرّر واختبر نفسك.</span></div><div class="stp"><i>٣</i><span>عد كل يوم لتراجع ما حفظت، وشاهد تقدّمك.</span></div></div>
-<div class="note">نص القرآن مأخوذ حرفيًا من مشروع Tanzil دون أي تعديل. وِرد أداة مساعدة ولا يغني عن معلّم متقن يصحّح تلاوتك. تجربة مجانية 30 يومًا، ثم اشتراك 100 جنيه شهريًا.</div>
+<h2>كيف تبدأ؟</h2><div class="card"><div class="stp"><i>١</i><span>أنشئ حسابك مجانًا ليُحفظ تقدّمك على أجهزتك.</span></div><div class="stp"><i>٢</i><span>احفظ وردك اليوم، واستمع وكرّر واختبر نفسك.</span></div><div class="stp"><i>٣</i><span>عد كل يوم لتراجع ما حفظت، وشاهد تقدّمك.</span></div></div>
+<div class="note">نص القرآن مأخوذ حرفيًا من مشروع Tanzil دون أي تعديل. وِرد أداة مساعدة ولا يغني عن معلّم متقن يصحّح تلاوتك. مجاني بالكامل، نسأل الله أن ينفع به.</div>
 <div class="lh"><button class="b" data-a="am" data-v="up">ابدأ الآن مجانًا</button></div>`
 
-function authHtml(){const m=am.m;return `<div class="card auth"><h2>${m==='in'?'تسجيل الدخول':'حساب جديد'}</h2>
+const pn=x=>{let d=x.replace(/[\u0660-\u0669]/g,c=>c.charCodeAt(0)-1632).replace(/[\u06F0-\u06F9]/g,c=>c.charCodeAt(0)-1776).replace(/\D/g,'');if(d.startsWith('0020'))d=d.slice(4);else if(d.startsWith('20')&&d.length===12)d=d.slice(2);if(d.length===10&&d[0]==='1')d='0'+d;return d};
+function authHtml(){const m=am.m,ad=m==='in'&&am.adm;return `<div class="card auth"><h2>${m==='in'?(ad?'دخول الإدارة':'تسجيل الدخول'):'حساب جديد'}</h2>
 <div class="seg"><button class="b${m==='in'?'':' b2'}" data-a="am" data-v="in">دخول</button><button class="b${m==='up'?'':' b2'}" data-a="am" data-v="up">حساب جديد</button></div>
 ${m==='up'?'<label class="f">الاسم<input id="an" autocomplete="name"></label>':''}<label class="f">البريد الإلكتروني<input id="ae" type="email" dir="ltr" autocomplete="email"></label>
-<label class="f">كلمة المرور (٦ أحرف على الأقل)<input id="ap" type="password" dir="ltr" autocomplete="${m==='in'?'current-password':'new-password'}"></label>
-${m==='up'?'<label class="f">رقم الهاتف (اختياري)<input id="ah" type="tel" dir="ltr" autocomplete="tel"></label>':''}
-<p id="ar" class="mut" role="alert" style="color:var(--er)"></p><button class="b" data-a="go">${m==='in'?'دخول':'إنشاء الحساب'}</button><button class="b b2" data-a="land">الصفحة الرئيسية</button>${m==='in'?'<button class="b b2" data-a="forgot">نسيت كلمة المرور؟</button>':''}
-<p class="mut">${m==='up'?'تبدأ بتجربة مجانية 30 يومًا بالضبط من لحظة إنشاء الحساب.':''} كلمة مرورك تُحفظ مشفّرة لدى خدمة المصادقة ولا يراها أحد.</p></div>`}
+${ad?'<label class="f">كلمة مرور الإدارة<input id="ap" type="password" dir="ltr" autocomplete="current-password"></label>':'<label class="f">رقم الموبايل<input id="ah" type="tel" dir="ltr" autocomplete="tel" placeholder="01xxxxxxxxx"></label>'}
+<p id="ar" class="mut" role="alert" style="color:var(--er)"></p><button class="b" data-a="go">${m==='in'?'دخول':'إنشاء الحساب'}</button><button class="b b2" data-a="land">الصفحة الرئيسية</button>
+${m==='in'?`<br><button class="b b2" data-a="adm">${ad?'العودة لدخول المستخدمين':'دخول الإدارة'}</button>`:''}${ad?'<button class="b b2" data-a="forgot">نسيت كلمة المرور؟</button>':''}
+<p class="mut">${ad?'':'الدخول بالبريد ورقم الموبايل بدون كلمة مرور، فاحرص على ألا تشارك بياناتك مع أحد. '}تُحفظ بياناتك في حسابك وتتزامن بين أجهزتك.</p></div>`}
 function showAuth(){U=null;$('#who').innerHTML='';$('#nav').style.display='none';$('#app').innerHTML=pg==='land'?landHtml():authHtml();scrollTo(0,0)}
 function showNewPw(){$('#who').innerHTML='';$('#nav').style.display='none';$('#app').innerHTML='<div class="card auth"><h2>كلمة مرور جديدة</h2><label class="f">كلمة المرور الجديدة<input id="ap" type="password" dir="ltr" autocomplete="new-password"></label><p id="ar" style="color:var(--er)"></p><button class="b" data-a="newpw">حفظ ودخول</button></div>'}
-async function go(){const R=$('#ar'),say=t=>{R.textContent=t},m=am.m,e=$('#ae').value.trim().toLowerCase(),p=$('#ap').value;
-if(!/^\S+@\S+\.\S+$/.test(e))return say('أدخل بريدًا إلكترونيًا صحيحًا');if(p.length<6)return say('كلمة المرور ٦ أحرف على الأقل');
+async function go(){const R=$('#ar'),say=t=>{R.textContent=t},m=am.m,e=$('#ae').value.trim().toLowerCase();
+if(!/^\S+@\S+\.\S+$/.test(e))return say('أدخل بريدًا إلكترونيًا صحيحًا');
+let p,ph='',nm='';
+if(m==='in'&&am.adm){p=$('#ap').value;if(p.length<6)return say('أدخل كلمة مرور الإدارة')}
+else{ph=pn($('#ah').value);if(ph.length<8||ph.length>15)return say('أدخل رقم موبايل صحيحًا');p=ph}
+if(m==='up'){nm=$('#an').value.trim();if(!nm)return say('أدخل الاسم')}
 try{say('جارٍ المعالجة…');let j;
-if(m==='up'){const nm=$('#an').value.trim();if(!nm)return say('أدخل الاسم');j=await raw('/auth/v1/signup?redirect_to='+encodeURIComponent(HOME()),{method:'POST',headers:H(),body:JSON.stringify({email:e,password:p,data:{full_name:nm,phone:$('#ah').value.trim()}})});
+if(m==='up'){j=await raw('/auth/v1/signup?redirect_to='+encodeURIComponent(HOME()),{method:'POST',headers:H(),body:JSON.stringify({email:e,password:p,data:{full_name:nm,phone:ph}})});
 if(!j.access_token)return say('تم إنشاء الحساب. أرسلنا رسالة تأكيد إلى بريدك، اضغط الرابط فيها ثم سجّل الدخول.')}
 else j=await raw('/auth/v1/token?grant_type=password',{method:'POST',headers:H(),body:JSON.stringify({email:e,password:p})});
 setSB(j);await enter()}catch(x){say(msg(x))}}
@@ -315,13 +320,8 @@ async function boot(){try{if(await fromHash())return}catch(x){}if(SB&&SB.refresh
 const fd=d=>d?new Date(d).toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'}):'—';
 const SL={trial:'تجربة مجانية',pending:'طلب قيد المراجعة',active:'اشتراك فعّال',expired:'منتهٍ',rejected:'مرفوض',suspended:'موقوف'};
 const wa=()=>`https://wa.me/${WA}?text=`+encodeURIComponent(`السلام عليكم، أرغب في الاشتراك في تطبيق وِرد لحفظ ومراجعة القرآن الكريم. الاسم: ${ST.full_name||U.name}، البريد الإلكتروني: ${ST.email}، مدة الاشتراك: شهر، قيمة الاشتراك: 100 جنيه.`);
-function banner(){if(!ST)return'';const s=ST.status,d=ST.trial_days_left,x=ST.sub_days_left;let m='',c='';
-if(s==='trial'){m=d<=1?'⏳ آخر يوم في تجربتك المجانية!':`🎁 تجربتك المجانية: متبقٍّ ${n(d)} يومًا.`;c=d<=1?'bad':d<=3?'warn':d<=7?'warn':''}
-else if(s==='active'&&x<=7){m=`اشتراكك ينتهي خلال ${n(x)} أيام، يمكنك طلب التجديد.`;c='warn'}
-else if(s==='pending'&&!ent()){m='طلب اشتراكك قيد المراجعة من الإدارة.'}
-else if(s==='expired'||s==='rejected'){m=ST.sub_end?'انتهى اشتراكك.':'انتهت الفترة التجريبية المجانية.';c='bad'}
-else if(s==='suspended'){m='حسابك موقوف إداريًا.';c='bad'}
-const un=NT.find(z=>!z.read);return (un?`<div class="bn ok">🔔 ${esc(un.message)} <button class="ch" data-a="nread">حسنًا</button></div>`:'')+(m?`<div class="bn ${c}">${m} <a href="#/sub">التفاصيل</a></div>`:'')}
+function banner(){if(!ST)return'';const un=NT.find(z=>!z.read);return (un?`<div class="bn ok">🔔 ${esc(un.message)} <button class="ch" data-a="nread">حسنًا</button></div>`:'')+(ST.status==='suspended'?'<div class="bn bad">حسابك موقوف إداريًا. تواصل مع الإدارة.</div>':'')}
+const suspp=()=>'<h2>الحساب موقوف</h2><div class="card"><p>تم إيقاف هذا الحساب إداريًا، فلا يمكن الحفظ أو المراجعة حاليًا. بياناتك محفوظة ولن تُحذف.</p><a class="b" target="_blank" rel="noopener" href="https://wa.me/201012702258">تواصل مع الإدارة</a></div>';
 function subp(){const s=ST.status,sx=!!ST.sub_end;
 const T={trial:'تجربتك المجانية فعّالة',pending:'طلبك قيد المراجعة',active:'اشتراكك فعّال',expired:sx?'انتهى اشتراكك':'انتهت الفترة التجريبية المجانية',rejected:'لم يُعتمد طلب اشتراكك السابق',suspended:'الحساب موقوف'}[s];
 const can=s!=='suspended'&&!ST.pending_request;
@@ -335,20 +335,17 @@ ${s==='suspended'?'':`<a class="b b2" target="_blank" rel="noopener" href="${wa(
 async function loadHist(){try{const j=await rpc('my_history'),L={trial_started:'بدء التجربة',requested:'طلب اشتراك',approved:'اعتماد اشتراك',rejected:'رفض طلب',renewed:'تجديد',suspended:'إيقاف',unsuspended:'إلغاء الإيقاف'};const e=$('#hist');if(e)e.innerHTML=j.map(x=>`<div class="ur">${L[x.kind]||x.kind} · <small>${fd(x.created_at)}${x.ends_at?' → '+fd(x.ends_at):''}</small>${x.note?'<br><small>'+esc(x.note)+'</small>':''}</div>`).join('')||'—'}catch(x){}}
 /* ===== admin ===== */
 const admp=()=>ST.is_admin?'<h2>لوحة الإدارة</h2><div id="adm">جارٍ التحميل…</div>':'<div class="card">غير مصرّح لك بدخول هذه الصفحة.</div>';
-const hook=h=>{if(h[0]==='sub'&&ST)loadHist();if(h[0]==='admin'&&ST&&ST.is_admin)h[1]?loadDet(h[1]):loadAdm()};
-async function loadAdm(){try{AD.err='';[AD.stats,AD.reqs,AD.users]=await Promise.all([rpc('admin_stats'),rpc('admin_list_requests',{p_status:'pending'}),rpc('admin_list_users',{q:AD.q,st:AD.st,sort_by:AD.o,p_limit:100,p_offset:0})])}catch(x){AD.err=msg(x)}const e=$('#adm');if(e)e.innerHTML=admBody()}
+const hook=h=>{if(h[0]==='admin'&&ST&&ST.is_admin)h[1]?loadDet(h[1]):loadAdm()};
+async function loadAdm(){try{AD.err='';[AD.stats,AD.users]=await Promise.all([rpc('admin_stats'),rpc('admin_list_users',{q:AD.q,st:AD.st,sort_by:AD.o,p_limit:100,p_offset:0})])}catch(x){AD.err=msg(x)}const e=$('#adm');if(e)e.innerHTML=admBody()}
 async function loadDet(id){try{AD.err='';AD.det=await rpc('admin_user_detail',{uid:id})}catch(x){AD.err=msg(x)}const e=$('#adm');if(e)e.innerHTML=detBody()}
 const reqRow=r=>`<div class="ur"><b>${esc(r.full_name)}</b> · ${esc(r.email)} ${r.phone?'· '+esc(r.phone):''}<br><small>${fd(r.created_at)} · ${n(r.amount_egp)} جنيه · ${r.status}</small>${r.status==='pending'?`<br><button class="b" data-a="apr" data-id="${r.id}">موافقة وتفعيل الاشتراك</button><button class="b b2" data-a="arj" data-id="${r.id}">رفض الطلب</button>`:''}</div>`;
 function admBody(){if(AD.err)return `<div class="bn bad">${esc(AD.err)}</div>`;const s=AD.stats||{};
-return `<div class="grid">${[['إجمالي الحسابات',s.total],['في التجربة',s.trial],['اشتراكات فعّالة',s.active],['منتهية',s.expired],['طلبات جديدة',s.open_requests],['موقوفة',s.suspended],['مدفوعات مسجّلة (جنيه)',s.recorded_revenue_egp]].map(([l,v])=>`<div class="card"><h3>${l}</h3><p class="big">${n(v||0)}</p></div>`).join('')}</div>
-<div class="card"><h3>طلبات الاشتراك الجديدة</h3>${AD.reqs.map(reqRow).join('')||'<small>لا طلبات</small>'}</div>
-<div class="card"><h3>المستخدمون</h3><label class="f">بحث بالاسم أو البريد<input type="search" id="aq" value="${esc(AD.q)}"></label><div class="grid"><label class="f">الحالة<select id="as"><option value="">الكل</option>${Object.keys(SL).map(k=>`<option value="${k}" ${AD.st===k?'selected':''}>${SL[k]}</option>`).join('')}</select></label><label class="f">الترتيب<select id="ao"><option value="created" ${AD.o==='created'?'selected':''}>تاريخ التسجيل</option><option value="sub_end" ${AD.o==='sub_end'?'selected':''}>انتهاء الاشتراك</option></select></label></div><button class="b" data-a="aload">تطبيق</button>
-${AD.users.map(u=>`<div class="ur"><a href="#/admin/${u.id}">${esc(u.full_name||'—')}</a> · ${esc(u.email)} ${u.phone?'· '+esc(u.phone):''}<br><small><b>${SL[u.status]}</b> · سُجّل ${fd(u.created_at)} · تجربة: ${fd(u.trial_start)} → ${fd(u.trial_end)} · اشتراك: ${u.sub_start?fd(u.sub_start)+' → '+fd(u.sub_end):'—'} · آخر دخول: ${fd(u.last_sign_in_at)}</small></div>`).join('')||'<small>لا نتائج</small>'}</div>`}
-function detBody(){if(AD.err)return `<div class="bn bad">${esc(AD.err)}</div><a href="#/admin">رجوع</a>`;const d=AD.det,p=d.profile;
-return `<a href="#/admin">← رجوع للوحة</a><div class="card"><h3>${esc(p.full_name||'—')}</h3>${esc(p.email)} ${p.phone?'· '+esc(p.phone):''}<p><b>${SL[p.status]}</b> · سُجّل ${fd(p.created_at)}<br>تجربة: ${fd(p.trial_start)} → ${fd(p.trial_end)}<br>اشتراك: ${p.sub_start?fd(p.sub_start)+' → '+fd(p.sub_end):'—'}<br>آخر دخول: ${fd(p.last_sign_in_at)}</p>${p.suspended?`<p>سبب الإيقاف: ${esc(p.suspended_reason||'—')}</p>`:''}
-<button class="b" data-a="ren" data-id="${p.id}">تجديد شهر يدويًا</button><button class="b b2" data-a="sus" data-id="${p.id}" data-f="${p.suspended?0:1}">${p.suspended?'إلغاء الإيقاف':'إيقاف الحساب'}</button></div>
-<div class="card"><h3>الطلبات</h3>${d.requests.map(r=>reqRow({...r,full_name:p.full_name,email:p.email,phone:p.phone})).join('')||'—'}</div>
-<div class="card"><h3>سجل الاشتراكات</h3>${d.events.map(e=>`<div class="ur">${e.kind} · <small>${fd(e.created_at)}${e.ends_at?' → '+fd(e.ends_at):''}${e.note?' · '+esc(e.note):''}</small></div>`).join('')}</div>`}
+return `<div class="grid">${[['إجمالي الحسابات',s.total],['الحسابات الموقوفة',s.suspended]].map(([l,v])=>`<div class="card"><h3>${l}</h3><p class="big">${n(v||0)}</p></div>`).join('')}</div>
+<div class="card"><h3>المستخدمون</h3><label class="f">بحث بالاسم أو البريد<input type="search" id="aq" value="${esc(AD.q)}"></label><label class="f">الحالة<select id="as"><option value="">الكل</option><option value="suspended" ${AD.st==='suspended'?'selected':''}>موقوف</option></select></label><input type="hidden" id="ao" value="created"><button class="b" data-a="aload">تطبيق</button>
+${AD.users.map(u=>`<div class="ur"><a href="#/admin/${u.id}">${esc(u.full_name||'—')}</a> · ${esc(u.email)} ${u.phone?'· '+esc(u.phone):''}<br><small>${u.suspended?'<b>موقوف</b> · ':''}سُجّل ${fd(u.created_at)} · آخر دخول: ${fd(u.last_sign_in_at)}</small></div>`).join('')||'<small>لا نتائج</small>'}</div>`}
+function detBody(){if(AD.err)return `<div class="bn bad">${esc(AD.err)}</div><a href="#/admin">رجوع</a>`;const p=AD.det.profile;
+return `<a href="#/admin">← رجوع للوحة</a><div class="card"><h3>${esc(p.full_name||'—')}</h3>${esc(p.email)} ${p.phone?'· '+esc(p.phone):''}<p>سُجّل ${fd(p.created_at)}<br>آخر دخول: ${fd(p.last_sign_in_at)}<br>الحالة: <b>${p.suspended?'موقوف':'نشط'}</b></p>${p.suspended?`<p>سبب الإيقاف: ${esc(p.suspended_reason||'—')}</p>`:''}
+<button class="b b2" data-a="sus" data-id="${p.id}" data-f="${p.suspended?0:1}">${p.suspended?'إلغاء الإيقاف':'إيقاف الحساب'}</button></div>`}
 const reload=()=>{const h=location.hash.replace('#/','').split('/');h[1]?loadDet(h[1]):loadAdm()};
 const adm=(f,ok)=>async()=>{try{await f();toast(ok);reload()}catch(x){toast(msg(x))}};
 Object.assign(A,{
@@ -361,7 +358,7 @@ apr:t=>ask('تأكيد اعتماد الاشتراك لمدة شهر؟ تأكد 
 arj:t=>{const r=prompt('سبب الرفض (اختياري)');if(r===null)return;adm(()=>rpc('admin_reject_request',{rid:+t.dataset.id,reason:r}),'تم رفض الطلب')()},
 ren:t=>ask('تجديد الاشتراك شهرًا لهذا المستخدم؟',adm(()=>rpc('admin_renew',{uid:t.dataset.id,note:'تجديد يدوي'}),'تم التجديد')),
 sus:t=>{const f=t.dataset.f==='1',r=f?prompt('سبب الإيقاف (اختياري)'):null;if(f&&r===null)return;adm(()=>rpc('admin_set_suspended',{uid:t.dataset.id,flag:f,reason:r}),f?'تم الإيقاف':'تم إلغاء الإيقاف')()}});
-R.sub=subp;R.admin=admp;
+R.admin=admp;
 document.addEventListener('visibilitychange',async()=>{if(U&&!document.hidden){const o=ST&&ST.status;try{await refSt()}catch(e){return}if(ST.status!==o)render()}});
 setInterval(async()=>{if(U){const o=ST&&ST.status;try{await refSt()}catch(e){return}if(ST.status!==o)render()}},300000);
 boot();
